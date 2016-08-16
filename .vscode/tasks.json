@@ -1,0 +1,12 @@
+{
+    "version": "0.1.0",
+    "command": "c:\\Python27\\python",
+    "args": ["test.py"],
+    "problemMatcher": {
+        "fileLocation": ["relative", "${workspaceRoot}"],
+        "pattern": {
+            "regexp": "^(.*)+s$",
+            "message": 1
+        }
+    }
+}

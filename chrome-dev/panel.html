@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <!-- Google Icon Font-->
+    <link href="http://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    
+    <!-- MaterializeCSS -->
+    <link type="text/css" rel="stylesheet" href="css/materialize.min.css" media="screen,projection" />
+    
+    <!-- Prism ( Syntax highlighting ) -->
+    <link href="css/prism.css" rel="stylesheet" />
+    
+    <!-- Toastr ( Toast notifications ) -->
+    <link href="css/toastr.min.css" rel="stylesheet" />
+</head>
+
+<body>
+    <!-- Jquery, all libraries are embedded for Chrome extension policies -->
+    <script type="text/javascript" src="js/lib/jquery-3.1.0.min.js"></script>
+    
+    <!-- MaterializeCSS -->
+    <script type="text/javascript" src="js/lib/materialize.min.js"></script>
+    
+    <!-- Prism ( Syntax highlighting ) -->
+    <script type="text/javascript" src="js/lib/prism.js"></script>
+    
+    <!-- Handlebarjs ( Templating engine ) -->
+    <script type="text/javascript" src="js/lib/handlebars-v4.0.5.js"></script>
+    
+    <!-- FileSaver.js trigger client-side downloads -->
+    <script type="text/javascript" src="js/lib/FileSaver.js"></script>
+
+    <!-- Toastr ( Toast notifications ) -->
+    <script type="text/javascript" src="js/lib/toastr.min.js"></script>
+
+    <!-- Templates -->
+    <!-- Template for new webpage -->
+    <script id="new-page-tpl" type="text/x-handlebards-template">
+    <li class="new-page-root">
+        <div class="collapsible-header  amber lighten-3"><i class="material-icons">toc</i><span style="white-space: nowrap;" class="page-name">{{name}}</span><a href="#!" class="secondary-content remove-page"><i class="material-icons red-text">delete</i></a></div>
+        <div class="collapsible-body">
+            <div class="row">
+                <div class="col s1"></div>
+                <form class="input-field col s6">
+                    <input id="page_id" value="" type="text" class="validate page-name-input">
+                    <label for="page_id">Page id</label>
+                </form>
+            </div>
+            <div class="divider"></div>
+            <div class="row">
+                <div class="col s12">
+                    <ul class="collection with-header">
+                        <li class="collection-header">
+                            <div>Items<a href="#item-page-add-modal" class="secondary-content modal-trigger"><i class="material-icons">add</i></a></div>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </li>
+    </script>
+
+    <!-- Template for new page item -->
+    <script id="new-page-item-tpl" type="text/x-handlebards-template">
+    <li class="collection-item">
+        <div><span style="white-space: nowrap;" class="item-name">{{name}}</span><a href="#!" class="secondary-content item-page-remove"><i class="material-icons orange-text darken-4">delete</i></a></div>
+    </li>
+    </script>
+
+    <!-- Main container -->
+    <div class="container">
+        <!-- Top main menu -->
+        <div class="row">
+            <div class="col s12">
+                <ul class="tabs">
+                    <li class="tab col s4"><a class="active" href="#pages">Pages</a></li>
+                    <li class="tab col s4"><a href="#settings">Settings</a></li>
+                    <li class="tab col s4"><a href="#preview">Preview</a></li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Menu contents -->
+        <div class="row">
+            <!-- Menu > Pages -->
+            <div id="pages" class="col s12">
+                <ul class="collapsible" data-collapsible="expandable">
+                    <!-- Generated pages go here -->
+                </ul>
+                <div class="row center-align">
+                    <!-- Red button triggers new page -->
+                    <a id="add-page" class="btn-floating btn-large waves-effect waves-light red"><i class="material-icons">add</i></a>
+                </div>
+            </div>
+            
+            <!-- Menu > Settings -->
+            <div id="settings" class="col s12">Settings</div>
+
+            <!-- Menu > Preview -->
+            <div id="preview" class="col s12">
+                <div class="row">
+                    <!-- Filename field -->
+                    <form class="input-field col s4">
+                        <input id="output-name" type="text" class="validate">
+                        <label id="output-name-label" for="output-name">Filename</label>
+                    </form>
+                    <!-- Big orange download button -->
+                    <div class="col s4">
+                        <a id="download-btn" class="waves-effect waves-light btn-large orange ">Download!</a>
+                    </div>
+                </div>
+                <div class="divider"></div>
+                
+                <!-- JSON output preview -->
+                <div class="row">
+                    <pre><code id="output-preview" class="language-json ">
+                        <!-- Generated output here -->
+                    </code></pre>
+                    <div class="divider"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal to add new item's page -->
+    <div id="item-page-add-modal" class="modal">
+        <div class="modal-content">
+            <h5>Add new item</h5>
+            <blockquote>
+                <p>
+                    Select the specific element with the developer tool:
+                    <br>
+            </blockquote>
+            </p>
+            <div class="row">
+                <div class="col s3">
+                    <a id="take-snapshot" href="#!" class="waves-effect waves-teal btn">Preview</a>
+                </div>
+                <div class="col s8">
+                    <pre><code id="new-element-uri" class="language-html">uri</code></pre>
+                </div>
+            </div>
+            <blockquote>
+                <p>
+                    Insert name:
+                </p>
+            </blockquote>
+            <div class="row">
+                <form class="input-field col s6">
+                    <input id="item-add-page-name" type="text" class="validate">
+                    <label for="item-add-page-name">Item name</label>
+                </form>
+            </div>
+            </div>
+            <div class="modal-footer">
+                <a id="new-page-item" href="#!" class="modal-action modal-close waves-effect green waves-green btn">Add</a>
+            </div>
+        </div>
+    </div>
+    
+    <!--web2api scripts -->
+    <script type="text/javascript" src="js/inject.js"></script>
+    <script type="text/javascript" src="js/panel.js"></script>
+</body>
+
+</html>

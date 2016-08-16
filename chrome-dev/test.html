@@ -1,0 +1,320 @@
+<head>
+    <!--Import Google Icon Font-->
+    <link href="http://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <!--Import materialize.css-->
+    <link type="text/css" rel="stylesheet" href="css/materialize.min.css" media="screen,projection">
+    <link href="css/prism.css" rel="stylesheet">
+</head>
+
+<body>
+    <!--Import jQuery before materialize.js-->
+    <script type="text/javascript" src="js/jquery-3.1.0.min.js"></script>
+    <script type="text/javascript" src="js/materialize.min.js"></script>
+    <script type="text/javascript" src="js/prism.js"></script>
+    <script type="text/javascript" src="js/handlebars-v4.0.5.js"></script>
+    <script type="text/javascript" src="js/FileSaver.js"></script>
+
+    <!-- Templates -->
+    <!-- Template for new webpage -->
+    <script id="new-page-tpl" type="text/x-handlebards-template">
+    <li class="new-page-root">
+        <div class="collapsible-header"><i class="material-icons">toc</i><span style="white-space: nowrap;" class="page-name">New page</span><a href="#!" class="secondary-content"><i class="material-icons red-text">delete</i></a></div>
+        <div class="collapsible-body">
+            <div class="row">
+                <div class="col s1"></div>
+                <form class="input-field col s6">
+                    <input id="page_id" value="" type="text" class="validate">
+                    <label for="page_id">Page id</label>
+                </form>
+            </div>
+            <div class="divider"></div>
+            <div class="row">
+                <div class="col s12">
+                    <ul class="collection with-header">
+                        <li class="collection-header">
+                            <div>Items<a href="#item-page-add-modal" class="secondary-content modal-trigger"><i class="material-icons">add</i></a></div>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </li>
+    </script>
+
+    <!-- Template for new page item -->
+    <script id="new-page-item-tpl" type="text/x-handlebards-template">
+    <li class="collection-item">
+        <div>ElementName3<a href="#!" class="secondary-content item-page-remove"><i class="material-icons orange-text darken-4">delete</i></a></div>
+    </li>
+    </script>
+
+    <!-- Main container -->
+    <div class="container">
+        <!-- Top main menu -->
+        <div class="row">
+            <div class="col s12">
+                <ul class="tabs" style="width: 100%;">
+                    <li class="tab col s3"><a class="active" href="#test1">Items</a></li>
+                    <li class="tab col s3"><a href="#test2">Display</a></li>
+                    <li class="tab col s3"><a href="#test3">Settings</a></li>
+                    <li class="tab col s3"><a href="#test4">Preview</a></li>
+                <div class="indicator" style="right: 960px; left: 0px;"></div></ul>
+            </div>
+        </div>
+
+        <!-- Menu contents -->
+        <div class="row">
+            <!-- Menu[Items] -->
+            <div id="test1" class="col s12">Items
+                <ul id"items-list"="" class="collapsible" data-collapsible="expandable">
+                    <li class="new-page-root">
+                        <div class="collapsible-header"><i class="material-icons">toc</i><span style="white-space: nowrap;" class="page-name">New page</span><a href="#!" class="secondary-content"><i class="material-icons red-text">delete</i></a></div>
+                        <div class="collapsible-body">
+                            <div class="row">
+                                <div class="col s1"></div>
+                                <form class="input-field col s6">
+                                    <input id="page_id" value="" type="text" class="validate">
+                                    <label for="page_id">Page id</label>
+                                </form>
+                            </div>
+                            <div class="divider"></div>
+                            <div class="row">
+                                <div class="col s12">
+                                    <ul class="collection with-header">
+                                        <li class="collection-header">
+                                            <div>Items<a href="#item-page-add-modal" class="secondary-content modal-trigger"><i class="material-icons">add</i></a></div>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </li>
+
+    <li class="new-page-root">
+        <div class="collapsible-header"><i class="material-icons">toc</i><span style="white-space: nowrap;" class="page-name">New page</span><a href="#!" class="secondary-content"><i class="material-icons red-text">delete</i></a></div>
+        <div class="collapsible-body">
+            <div class="row">
+                <div class="col s1"></div>
+                <form class="input-field col s6">
+                    <input id="page_id" value="" type="text" class="validate">
+                    <label for="page_id">Page id</label>
+                </form>
+            </div>
+            <div class="divider"></div>
+            <div class="row">
+                <div class="col s12">
+                    <ul class="collection with-header">
+                        <li class="collection-header">
+                            <div>Items<a href="#item-page-add-modal" class="secondary-content modal-trigger"><i class="material-icons">add</i></a></div>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </li>
+
+    <li class="new-page-root">
+        <div class="collapsible-header"><i class="material-icons">toc</i><span style="white-space: nowrap;" class="page-name">New page</span><a href="#!" class="secondary-content"><i class="material-icons red-text">delete</i></a></div>
+        <div class="collapsible-body">
+            <div class="row">
+                <div class="col s1"></div>
+                <form class="input-field col s6">
+                    <input id="page_id" value="" type="text" class="validate">
+                    <label for="page_id">Page id</label>
+                </form>
+            </div>
+            <div class="divider"></div>
+            <div class="row">
+                <div class="col s12">
+                    <ul class="collection with-header">
+                        <li class="collection-header">
+                            <div>Items<a href="#item-page-add-modal" class="secondary-content modal-trigger"><i class="material-icons">add</i></a></div>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </li>
+
+    <li class="new-page-root">
+        <div class="collapsible-header"><i class="material-icons">toc</i><span style="white-space: nowrap;" class="page-name">New page</span><a href="#!" class="secondary-content"><i class="material-icons red-text">delete</i></a></div>
+        <div class="collapsible-body">
+            <div class="row">
+                <div class="col s1"></div>
+                <form class="input-field col s6">
+                    <input id="page_id" value="" type="text" class="validate">
+                    <label for="page_id">Page id</label>
+                </form>
+            </div>
+            <div class="divider"></div>
+            <div class="row">
+                <div class="col s12">
+                    <ul class="collection with-header">
+                        <li class="collection-header">
+                            <div>Items<a href="#item-page-add-modal" class="secondary-content modal-trigger"><i class="material-icons">add</i></a></div>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </li>
+
+    <li class="new-page-root">
+        <div class="collapsible-header"><i class="material-icons">toc</i><span style="white-space: nowrap;" class="page-name">New page</span><a href="#!" class="secondary-content"><i class="material-icons red-text">delete</i></a></div>
+        <div class="collapsible-body">
+            <div class="row">
+                <div class="col s1"></div>
+                <form class="input-field col s6">
+                    <input id="page_id" value="" type="text" class="validate">
+                    <label for="page_id">Page id</label>
+                </form>
+            </div>
+            <div class="divider"></div>
+            <div class="row">
+                <div class="col s12">
+                    <ul class="collection with-header">
+                        <li class="collection-header">
+                            <div>Items<a href="#item-page-add-modal" class="secondary-content modal-trigger"><i class="material-icons">add</i></a></div>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </li>
+
+    <li class="new-page-root">
+        <div class="collapsible-header"><i class="material-icons">toc</i><span style="white-space: nowrap;" class="page-name">New page</span><a href="#!" class="secondary-content"><i class="material-icons red-text">delete</i></a></div>
+        <div class="collapsible-body">
+            <div class="row">
+                <div class="col s1"></div>
+                <form class="input-field col s6">
+                    <input id="page_id" value="" type="text" class="validate">
+                    <label for="page_id">Page id</label>
+                </form>
+            </div>
+            <div class="divider"></div>
+            <div class="row">
+                <div class="col s12">
+                    <ul class="collection with-header">
+                        <li class="collection-header">
+                            <div>Items<a href="#item-page-add-modal" class="secondary-content modal-trigger"><i class="material-icons">add</i></a></div>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </li>
+
+    <li class="new-page-root">
+        <div class="collapsible-header"><i class="material-icons">toc</i><span style="white-space: nowrap;" class="page-name">New page</span><a href="#!" class="secondary-content"><i class="material-icons red-text">delete</i></a></div>
+        <div class="collapsible-body">
+            <div class="row">
+                <div class="col s1"></div>
+                <form class="input-field col s6">
+                    <input id="page_id" value="" type="text" class="validate">
+                    <label for="page_id">Page id</label>
+                </form>
+            </div>
+            <div class="divider"></div>
+            <div class="row">
+                <div class="col s12">
+                    <ul class="collection with-header">
+                        <li class="collection-header">
+                            <div>Items<a href="#item-page-add-modal" class="secondary-content modal-trigger"><i class="material-icons">add</i></a></div>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </li>
+
+    <li class="new-page-root">
+        <div class="collapsible-header"><i class="material-icons">toc</i><span style="white-space: nowrap;" class="page-name">New page</span><a href="#!" class="secondary-content"><i class="material-icons red-text">delete</i></a></div>
+        <div class="collapsible-body">
+            <div class="row">
+                <div class="col s1"></div>
+                <form class="input-field col s6">
+                    <input id="page_id" value="" type="text" class="validate">
+                    <label for="page_id">Page id</label>
+                </form>
+            </div>
+            <div class="divider"></div>
+            <div class="row">
+                <div class="col s12">
+                    <ul class="collection with-header">
+                        <li class="collection-header">
+                            <div>Items<a href="#item-page-add-modal" class="secondary-content modal-trigger"><i class="material-icons">add</i></a></div>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </li>
+    </ul>
+                <div class="row center-align">
+                    <a id="add-page" class="btn-floating btn-large waves-effect waves-light red"><i class="material-icons">add</i></a>
+                </div>
+            </div>
+            <div id="test2" class="col s12" style="display: none;">Display</div>
+            <div id="test3" class="col s12" style="display: none;">Settings</div>
+            <div id="test4" class="col s12" style="display: none;">
+                <div class="row">
+                    <form class="input-field col s4">
+                        <input id="output-name" type="text" class="validate">
+                        <label id="output-name-label" for="output-name">Filename</label>
+                    </form>
+                    <div class="col s4">
+                        <a id="download-btn" class="waves-effect waves-light btn-large orange ">Download!</a>
+                    </div>
+                </div>
+                <div class="divider"></div>
+                <div class="row">
+                    <pre class=" language-json"><code id="output-preview" class="  language-json"><span class="token punctuation">{</span>
+	<span class="token property">"output-example"</span><span class="token operator">:</span> <span class="token string">"add something to see output!"</span>
+<span class="token punctuation">}</span></code></pre>
+                    <div class="divider"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal to add new item's page -->
+    <div id="item-page-add-modal" class="modal">
+        <div class="modal-content">
+            <h5>Add new item</h5>
+            <blockquote>
+                <p>
+                    Select the specific element with the developer tool:
+                    <br>
+            </p></blockquote>
+            <p></p>
+            <div class="row">
+                <div class="col s3">
+                    <a class="waves-effect waves-teal btn">Preview</a>
+                </div>
+                <div class="col s8">
+                    <pre class=" language-html"><code class=" language-html"><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>div</span><span class="token punctuation">&gt;</span></span>.class#id<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>tag</span><span class="token punctuation">&gt;</span></span></code></pre>
+                </div>
+            </div>
+            <blockquote>
+                <p>
+                    Insert name:
+                </p>
+            </blockquote>
+            <div class="row">
+                <form class="input-field col s6">
+                    <input id="item-add-page-name" type="text" class="validate">
+                    <label for="item-add-page-name">Item name</label>
+                </form>
+            </div>
+            </div>
+            <div class="modal-footer">
+                <a href="#!" class=" modal-action modal-close waves-effect green waves-green btn">Add</a>
+            </div>
+        </div>
+
+    <script type="text/javascript" src="js/panel.js"></script>
+
+
+
+<div class="hiddendiv common"></div></body>
