@@ -6,6 +6,7 @@ from urlparse import urlparse
 # Local imports
 from log import info, warning, error
 import hosts
+import session
 
 class NoHostsFoundError(Exception):
     pass
@@ -14,6 +15,7 @@ SEARCHABLE_HOST_FILE_EXT = '.host.config'
 
 Request = hosts.Request
 QueryError = hosts.QueryError
+Session = session.Session
 
 """
 Public API interface
@@ -42,12 +44,10 @@ class Web2API:
     as specified in the config file.
 
     @param request Request to be done 
-    @param session Optional session to be associated with the request
-    @param auth Optional authentication data to be associated with the request
-    @param proxies Optional list of proxies to be used. Every host has its
+    @param session Optional session to be associated with the request (contains proxies/ authentications )
         own proxy usage configuration
     """
-    def query(self, request, session=None, auth=None, proxies=None):
+    def query(self, request, session=None):
         if not self.hosts:
             raise NoHostsFoundError('No hosts were loaded during construction')
         
@@ -62,7 +62,7 @@ class Web2API:
             raise NoHostsFoundError('No host found matching: ' + domain)
         
         info('Found suitable host for: ' + domain)
-        return self.hosts[domain].query(request)
+        return self.hosts[domain].query(request, session)
         
 
 
@@ -73,7 +73,8 @@ class Web2API:
                     with open(os.path.join(self.root_dir, filename)) as fs:
                         info('Found host: ', filename)
                         try:
-                            host = hosts.SearchableHost(json.loads(fs.read()))
+                            data = fs.read()
+                            host = hosts.SearchableHost(json.loads(data))
                             if host.domain in self.hosts:
                                 warning('Duplicate config file found for: ', host.domain)
                             else:

@@ -17,6 +17,7 @@ item_pages : [] | List of item pages
 # Standard library imports
 from urlparse import urlparse
 import re
+import math
 
 # Local imports 
 from log import info, warning
@@ -41,8 +42,15 @@ HOST_CONFIG_DP_ITEM = 'item_uri'
 HOST_CONFIG_DP_ITEM_ID = 'item_id'
 
 HOST_CONFIG_IP_ID = 'id'
+HOST_CONFIG_IP_PATHNAME = 'pathname'
 HOST_CONFIG_IP_ELEMENTS = 'elements'
 
+HC_RATING_DEPTH_TRUST_THRESHOLD = 'depth_trust_threshold'
+HC_RATING_ID_TRUST_RATIO = 'id_trust_ratio'
+HC_RATING_CLASS_TRUST_RATIO = 'class_trust_ratio'
+HC_RATING_MITIGATION_THRESHOLD = 'mitigation_threshold'
+HC_RATING_TRUST_THRESHOLD = 'trust_threshold'
+HC_RATING_FULL_MATCH_ADVANTAGE = 'full_match_advantage'
 
 class InvalidConfigFileError(Exception):
     pass
@@ -110,6 +118,13 @@ class ElementURI:
             if match:
                 self.tags.append(match.group(ElementURI.TAG_RE_GROUP), match.group(ElementURI.ID_RE_GROUP), match.group(ElementURI.CLASS_RE_GROUP))
                 string = string[match.end():]
+    
+    """
+    Finds all the references matching the current ElementURI inside the html page
+    based off the specified rating system
+    """
+    def find_all(self, html_data, rating):
+        pass
 
 
 class DisplayPage:
@@ -136,10 +151,12 @@ class DisplayPage:
 class ItemPage:
     def __init__(self, data):
         self.id = None
+        self.pathname = None
         self.items = { }
 
         try:
             self.id = _load_value(data, HOST_CONFIG_IP_ID)
+            self.pathname = _load_value(data, HOST_CONFIG_IP_PATHNAME)
             
             for key,value in _load_value(data, HOST_CONFIG_IP_ELEMENTS).iteritems():
                 self.items[key] = ElementURI(value)
@@ -147,9 +164,35 @@ class ItemPage:
         except RequiredElementNotFoundError as e:
             raise InvalidConfigFileError(str(e))
 
-class Rating:
-    def __init__(self):
+    def match(self, html_page, rating):
         pass
+
+class Rating:
+    def __init__(self, data):
+        self.depth_trust_threshold = None
+        self.id_trust_ratio = None
+        self.class_trust_ratio = None
+        self.mitigation_threshold = None
+        self.trust_threshold = None
+        self.full_match_advantage = None
+        self.area_integral = None
+
+        try:
+            self.depth_trust_threshold = _load_value(data, HC_RATING_DEPTH_TRUST_THRESHOLD)
+            self.id_trust_ratio = _load_value(data, HC_RATING_ID_TRUST_RATIO)
+            self.class_trust_ratio = _load_value(data, HC_RATING_CLASS_TRUST_RATIO)
+            self.mitigation_threshold = _load_value(data, HC_RATING_MITIGATION_THRESHOLD)
+            self.trust_threshold = _load_value(data, HC_RATING_TRUST_THRESHOLD)
+            self.full_match_advantage = _load_value(data, HC_RATING_FULL_MATCH_ADVANTAGE)
+
+            assert(self.id_trust_ratio + self.class_trust_ratio <= 1.0001)
+
+            self.area_integral = 0
+            for i in range(100):
+                self.area_integral += self.depth_trust_threshold / math.pow((i + math.sqrt(self.depth_trust_threshold)), 2)
+
+        except RequiredElementNotFoundError as e:
+            raise InvalidConfigFileError(str(e))
 
 class Request:
     def __init__(self):
@@ -165,6 +208,7 @@ class SearchableHost:
 
         self.display_pages = { } 
         self.item_pages = { }
+        self.rating = None
 
         self._init_from_data(data)
 
@@ -192,20 +236,25 @@ class SearchableHost:
                 self.base_url = 'http://' + self.base_url
             self.domain = urlparse(self.base_url).hostname
 
+            self.rating = Rating(_load_value(data, HOST_CONFIG_RATING))
+
         except RequiredElementNotFoundError as e:
             raise InvalidConfigFileError(str(e))
     
-    def query(self, request):
+    def query(self, request, session):
         # Let's see what kind of request the user wants:
         if request.id in self.item_pages:
             info('Found valid ID for single page: ', str(request.id))
+
+            html_data = session.wget(self.base_url + self.item_pages[request.id].pathname)
+            result = self.item_pages[request.id].match(html_data, self.rating)
+
+            print(result)
 
             return
         
         if request.id in self.display_pages:
             info('Found valid ID for display page: ', str(request.id))
-
             return
 
         raise QueryError('ID: ' + str(request.id) + ' not found for host: ' + self.domain)
-            
