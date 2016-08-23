@@ -1,23 +1,9 @@
-"""
-Sample configuration file for hosts. NOTE This can be tweaked manually, but 
-generation should be left to the javascript frontend
-
-Valid Root Elements. They will be enclosed in square brackets if optional
-base_url : www.google.com | Base URL for the API, this is unique and there can 
-    only be one configuration file for each domain
-
-[cache_limit] : 512 | Limit in MB that the cache is allowed to use 
-[cache_timeout] : 2.0 | Time in seconds after which the cache entry is removed
-
-display_pages : [] | List of DisplayPage
-item_pages : [] | List of item pages 
-
-"""
-
 # Standard library imports
 from urlparse import urlparse
 import re
 import math
+import BeautifulSoup
+import difflib
 
 # Local imports 
 from log import info, warning
@@ -82,6 +68,20 @@ class Tag:
     def __str__(self):
         return "Node({0},{1},{2})".format(self.tag, self.id_val, self.class_val)
 
+def id_from_bs_elem(elem):
+    for attr in elem.attrs:
+        if attr[0] == 'id':
+            return attr[1]
+    return ''
+
+def class_from_bs_elem(elem):
+    for attr in elem.attrs:
+        if attr[0] == 'class':
+            return attr[1]
+    return ''
+
+    
+
 """
 Structure of uris is as follows:
 <target>[<tag>id,class]*
@@ -91,7 +91,7 @@ id,class = id and class for the preceding tag
 """
 class ElementURI:
     TARGET_RE_GROUP = 'target'
-    TARGET_RE = r'(?P<{0}><[a-zA-Z0-9]*>)'.format(TARGET_RE_GROUP)
+    TARGET_RE = r'(?P<{0}><[a-zA-Z]*>)\<[a-zA-Z]*\>'.format(TARGET_RE_GROUP)
 
     TAG_RE_GROUP = 'tags'
     ID_RE_GROUP = 'id'
@@ -105,26 +105,101 @@ class ElementURI:
         target_re = re.compile(ElementURI.TARGET_RE)
         match = target_re.match(string)
         if not match:
-            raise InvalidElementURIFormat('Invalid URI format: ' + string)
-        
-        # Removing angular brackets
-        self.target = match.group(ElementURI.TARGET_RE_GROUP)[1:-1]
+            self.target = None
+        else:
+            # Removing angular brackets
+            self.target = match.group(ElementURI.TARGET_RE_GROUP)[1:-1]
+            string = string[match.end():]
 
         # Moving to tags
-        string = string[match.end():]
         tags_re = re.compile(ElementURI.TAGS_RE)
-        while match:
+        while True:
             match = tags_re.match(string)
             if match:
-                self.tags.append(match.group(ElementURI.TAG_RE_GROUP), match.group(ElementURI.ID_RE_GROUP), match.group(ElementURI.CLASS_RE_GROUP))
+                self.tags.append(Tag(match.group(ElementURI.TAG_RE_GROUP), match.group(ElementURI.ID_RE_GROUP), match.group(ElementURI.CLASS_RE_GROUP)))
                 string = string[match.end():]
+            else:
+                break
+        self.tags = self.tags[::-1]
     
+    def rate(self, bs_elem, depth, rating):
+        bs_id = id_from_bs_elem(bs_elem)
+        bs_class = class_from_bs_elem(bs_elem)
+
+        id_dist = difflib.SequenceMatcher(None, bs_id, self.tags[depth].id_val).ratio()
+        class_dist = difflib.SequenceMatcher(None, bs_class, self.tags[depth].class_val).ratio()
+
+        importance = rating.depth_trust_threshold / math.pow((depth + math.sqrt(rating.depth_trust_threshold)), 2)
+        rampup = min((depth / rating.mitigation_threshold) * (depth / rating.mitigation_threshold), 1)
+        return rampup * importance *(id_dist * rating.id_trust_ratio + class_dist * rating.class_trust_ratio)
+
     """
     Finds all the references matching the current ElementURI inside the html page
     based off the specified rating system
     """
     def find_all(self, html_data, rating):
-        pass
+        if not self.tags: # TODO:: Should I output some kind of warning ? 
+            return None
+
+        results = []
+
+        soup = BeautifulSoup.BeautifulSoup(html_data)
+        tmp_elems = soup.findAll(self.tags[-1].tag)
+        elems_to_eval = []
+        for element in tmp_elems:
+            id_dist = difflib.SequenceMatcher(None, id_from_bs_elem(element), self.tags[-1].id_val).ratio()
+            class_dist = difflib.SequenceMatcher(None, class_from_bs_elem(element), self.tags[-1].class_val).ratio()
+            if id_dist > rating.generable_dist and class_dist > rating.generable_dist:
+                elems_to_eval.append(element)
+
+        final_res = []
+
+        for result in elems_to_eval:
+            total = 0.0
+
+            res_id = id_from_bs_elem(result)
+            res_class = class_from_bs_elem(result)
+
+            # TODO: Think this through
+            #if self.tags[-1].id_value == res_id and self.tags[-1].class_value == res_class:
+                #total += rating.full_match_advantage
+
+            # Calculate result depth
+            next_res = result
+            depth = 0
+            while next_res:
+                next_res = next_res.parent
+                depth += 1
+
+            expected_depth = len(self.tags)
+            to_eval = result
+
+            # Need to discard some nodes
+            args_delta = 0
+            if depth > expected_depth:
+                delta_depth = depth - expected_depth
+                while delta_depth > 1:
+                    to_eval = to_eval.parent
+                    delta_depth -= 1
+            else:
+                args_delta = expected_depth - depth +1
+                # Assuming max trust on lost elements
+                for i in range(expected_depth - depth, expected_depth):
+                    total += rating.depth_trust_threshold / math.pow((i + math.sqrt(rating.depth_trust_threshold)), 2)
+
+            # we climb up to delta_depth
+            evaluated = 0
+            while to_eval:
+                total += self.rate(to_eval, expected_depth - args_delta - evaluated - 1, rating)
+                evaluated += 1
+                to_eval = to_eval.parent
+
+
+            trust = total / rating.area_integral
+            if trust >= rating.trust_threshold:
+                final_res.append(result)
+
+        return final_res
 
 
 class DisplayPage:
@@ -165,10 +240,16 @@ class ItemPage:
             raise InvalidConfigFileError(str(e))
 
     def match(self, html_page, rating):
-        pass
+        ret = { } 
+
+        for key,value in self.items.iteritems():
+            ret[key] = value.find_all(html_page, rating)
+
+        return ret
 
 class Rating:
     def __init__(self, data):
+        self.generable_dist = 0.7
         self.depth_trust_threshold = None
         self.id_trust_ratio = None
         self.class_trust_ratio = None
@@ -193,6 +274,18 @@ class Rating:
 
         except RequiredElementNotFoundError as e:
             raise InvalidConfigFileError(str(e))
+    
+    def __str__(self):
+        return """Rating:
+Generable distance: {0}
+Depth trust threshold: {1}
+Id trust ratio: {2}
+Class trust ratio: {3}
+Mitigation threshold: {4}
+Trust threshold: {5}
+Full match advantage: {6}
+Area integral: {7}""".format(self.generable_dist, self.depth_trust_threshold, self.id_trust_ratio, self.class_trust_ratio, 
+        self.mitigation_threshold, self.trust_threshold, self.full_match_advantage, self.area_integral)
 
 class Request:
     def __init__(self):
@@ -249,9 +342,7 @@ class SearchableHost:
             html_data = session.wget(self.base_url + self.item_pages[request.id].pathname)
             result = self.item_pages[request.id].match(html_data, self.rating)
 
-            print(result)
-
-            return
+            return result
         
         if request.id in self.display_pages:
             info('Found valid ID for display page: ', str(request.id))

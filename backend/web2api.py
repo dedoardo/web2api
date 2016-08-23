@@ -80,6 +80,7 @@ class Web2API:
                             else:
                                 self.hosts[host.domain] = host
                             info('Successfully loaded config file for: ', host.domain)
+                            info(str(host.rating))
                         except hosts.InvalidConfigFileError as e:
                             error('Failed to load: ', filename, ' with error: ', str(e))
                         except ValueError as e:
